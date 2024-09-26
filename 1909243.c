@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <time.h>
 #include <math.h>
-#define ARRAY_LENTH(array) (sizeof(array) / sizeof((array)[0]))
+#define ARRAY_LENGTH(array) (sizeof(array) / sizeof((array)[0]))
 #define RUNTIME(start, end) (((double)(end - start)) / CLOCKS_PER_SEC)
 
 // Реализовать возведение в целую степень — в лоб (за линейное время) и за О(log n).
@@ -48,12 +48,12 @@ const double recursivePower(int base, int exponent) // ~logN
     double absResult = (double)positiveExponentRecursivePower(base, exponent);
     return exponentIsPositive ? absResult : 1 / absResult; 
 }
-const double average(double *array, int lenth) {
+const double average(double *array, int length) {
     double arraySum = 0;
-    for (int i = 0; i < lenth; i++) {
+    for (int i = 0; i < length; i++) {
         arraySum += array[i];
     }
-    return arraySum / (double)lenth;
+    return arraySum / (double)length;
 }
 
 const bool compareWithLib(int base, int exponent, double resultNeedToCheck, int orderOfAccuracy) {
@@ -66,14 +66,14 @@ const bool compareWithLib(int base, int exponent, double resultNeedToCheck, int 
 
 const bool globalTest(int maxExponent, int orderOfAccuracy, bool needToDisplayFails) {
     int base[] = {-3, -2, -1, 0, 1, 2, 3, 4, 5};
-    int basesLenth = ARRAY_LENTH(base);
+    int basesLength = ARRAY_LENGTH(base);
     bool isTestSuccesful = true;
     int countOfSuccesfulTests = 0;
     int countOfTests = 0;
     double classicPowerRuntime = 0;
     double recursivePowerRuntime = 0;
     double libPowerRuntime = 0;
-    for (int basePeaker = 0; basePeaker < basesLenth; basePeaker++) {
+    for (int basePeaker = 0; basePeaker < basesLength; basePeaker++) {
         for (int i = -3; i <= maxExponent; i++) {
             clock_t start, end;
 
