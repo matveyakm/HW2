@@ -3,12 +3,14 @@
 #include <math.h>
 #include <time.h>
 #include <stdbool.h>
-#define RUNTIME(start, end) (((double)(end - start)) / CLOCKS_PER_SEC)
+#define TIME_USED(start, end) (((double)(end - start)) / CLOCKS_PER_SEC)
 
 // Реализовать вычисление чисел Фибоначчи рекурсивно, реализовать итеративно, выяснить, с какого номера числа Фибоначчи рекурсивный вариант заметно медленнее итеративного.
 
 const long long FibonacciByBinet(int n) {
-    if (n == 1 || n == 3) return n == 1 ? 1 : 2; // Исключения из-за ошибки деления double
+    if (n == 1 || n == 3) {
+        return n == 1 ? 1 : 2; // Исключения из-за ошибки деления double
+    }
     double fi = (1 + sqrt(5)) / 2;
     double n_fi = (1 - sqrt(5)) / 2;
     return (long long)(ceil(pow(fi, n) + pow(n_fi, n)) / sqrt(5));
@@ -30,9 +32,12 @@ const long long recursiveFibonacci(int n) {
 }
 
 const long long slowRecursiveFibonacci(int n) {
-    if (n == 0 || n == 1) return (long long)n;
+    if (n == 0 || n == 1) {
+        return (long long)n;
+    }
     return slowRecursiveFibonacci(n - 1) + slowRecursiveFibonacci(n - 2);
 }
+
 const  long long loopFibonacci(int n) {
     if (n < 2) {
         return n;
@@ -63,12 +68,14 @@ const long long arrayFillingFibonicc(int n) {
 }
 
 const bool globalTest(int calculationsCeil, bool needToDisplayAllRuntimeIntervals, bool needToDisplayCalculationResults) {
+    // -- exceptions --
     if (calculationsCeil > 92) {
         calculationsCeil = 92;
         printf("Because of overflow max Fibonacci number can be calculated is 92-nd\n");
     } else if (calculationsCeil > 72) {
         printf("Because of non-accuarcy of 'double' type calculations Binet's formula can make mistakes for n > 72\n");
     }
+    // -- opening file with prefilled values --
     FILE *preFilledFibonacciNums = fopen("/Users/matveyakm/Documents/HW2/FibonacciNums.txt", "r"); //macbook compilation needs full file path
     bool fileReadingError = preFilledFibonacciNums == NULL;
     size_t readingBufferSize = 512;
@@ -91,6 +98,7 @@ const bool globalTest(int calculationsCeil, bool needToDisplayAllRuntimeInterval
             }
         }
     }
+    // -- naming for debug info displaying --
     char methodName[5][30] = {
         "Recursion method",
         "Method using loop",
@@ -98,42 +106,43 @@ const bool globalTest(int calculationsCeil, bool needToDisplayAllRuntimeInterval
         "Method using array filling",
         "Dumb recursion method"
     };
+    // -- check for correct calculation of values from 0 to 'calculationsCeil' --
     bool isAllResultsCorrect = true;
+    clock_t start, end;
     double requiredTimeInSum[5] = {0.0f};
     int n = 0;
     while (n <= calculationsCeil) {
-        clock_t start, end;
         double requiredTime[5] = {0.0f};
 
         start = clock();
-        long long recursiveResult = recursiveFibonacci(n);
+        long long recursiveResult = recursiveFibonacci(n); // recursion based on iterative
         end = clock();
-        requiredTime[0] = RUNTIME(start, end);
+        requiredTime[0] = TIME_USED(start, end);
         
         start = clock();
-        long long BinetsFormulaResult = FibonacciByBinet(n);
+        long long BinetsFormulaResult = FibonacciByBinet(n); // Binet's formula
         end = clock();
-        requiredTime[1] = RUNTIME(start, end);
+        requiredTime[1] = TIME_USED(start, end);
 
         start = clock();
-        long long loopResult = loopFibonacci(n);
+        long long loopResult = loopFibonacci(n); // calculations in loop
         end = clock();
-        requiredTime[2] = RUNTIME(start, end);
+        requiredTime[2] = TIME_USED(start, end);
 
         start = clock();
-        long long arrayFillingResult = arrayFillingFibonicc(n);
+        long long arrayFillingResult = arrayFillingFibonicc(n); // calculations in loop with filling full array
         end = clock();
-        requiredTime[3] = RUNTIME(start, end);
+        requiredTime[3] = TIME_USED(start, end);
 
-        long long slowRecursiveResult = preFilledNumArray[n]; // слишком много времени займёт тест, если считать этим методом дальше 42
+        long long slowRecursiveResult = preFilledNumArray[n]; // too slow to calculate nums more than 42nd
         requiredTime[4] = INFINITY;
         if (n < 42) {
             start = clock();
-            long long slowRecursiveResult = slowRecursiveFibonacci(n);
+            long long slowRecursiveResult = slowRecursiveFibonacci(n); // recursion from bigger to smaller
             end = clock();
-            requiredTime[4] = RUNTIME(start, end);
+            requiredTime[4] = TIME_USED(start, end);
         }
-
+        // -- debug info displaying--
         if (needToDisplayAllRuntimeIntervals || needToDisplayCalculationResults) {
             printf("%d  ", n);
         }
@@ -146,6 +155,7 @@ const bool globalTest(int calculationsCeil, bool needToDisplayAllRuntimeInterval
                 }
             }
         }
+        // -- comparing calculated values with prefilled --
         long long calculationResults[5] = {recursiveResult, loopResult, BinetsFormulaResult, arrayFillingResult, slowRecursiveResult};
         bool isEachResultCorrect[5] = {true, true, true, true, true}; // {true} == {true, false, false, false, false}
         bool isCalculationsCorrect = true;
@@ -154,13 +164,14 @@ const bool globalTest(int calculationsCeil, bool needToDisplayAllRuntimeInterval
                 isEachResultCorrect[i] = preFilledNumArray[n] == calculationResults[i];
             }
             isCalculationsCorrect *= isEachResultCorrect[i];
-            if (needToDisplayCalculationResults) {
+            if (needToDisplayCalculationResults) { // debug info
                 printf("%lld ", calculationResults[i]);
                 if (i == 4) {
                     printf("\n");
                 }
             }
         }
+        // -- debug info displaying --
         for (int i = 0; i < 5; i++) {
             if (!isEachResultCorrect[i] && (!(n >= 72 && i == 2) || needToDisplayCalculationResults)) {
                 printf("%s failed (n = %d, calculated %lld, expected %lld) \n", methodName[i], n, calculationResults[i], preFilledNumArray[n]);
@@ -168,6 +179,7 @@ const bool globalTest(int calculationsCeil, bool needToDisplayAllRuntimeInterval
         }
         n++;
     }
+    // -- displaying test results --
     if (fileReadingError) {
         printf("\nTest skipped (file cant be opened)\n");
     } else if (calculationsCeil >= 72) {
@@ -178,6 +190,7 @@ const bool globalTest(int calculationsCeil, bool needToDisplayAllRuntimeInterval
     for (int i = 0; i < 5; i++) {
         printf("%s used %.6f secs for calucalute Fibonacci numbers from 0 to %d\n", methodName[i], requiredTimeInSum[i], calculationsCeil);
     }
+
     fclose(preFilledFibonacciNums);
     free(preFilledNumArray);
     free(readingBuffer);

@@ -4,8 +4,8 @@
 #include <stdbool.h>
 #include <time.h>
 #include <math.h>
-#define ARRAY_LENTH(array) (sizeof(array) / sizeof((array)[0]))
-#define RUNTIME(start, end) (((double)(end - start)) / CLOCKS_PER_SEC)
+#define ARRAY_LENGTH(array) (sizeof(array) / sizeof((array)[0]))
+#define TIME_USED(start, end) (((double)(end - start)) / CLOCKS_PER_SEC)
 
 // Реализовать возведение в целую степень — в лоб (за линейное время) и за О(log n).
 
@@ -48,13 +48,6 @@ const double recursivePower(int base, int exponent) // ~logN
     double absResult = (double)positiveExponentRecursivePower(base, exponent);
     return exponentIsPositive ? absResult : 1 / absResult; 
 }
-const double average(double *array, int lenth) {
-    double arraySum = 0;
-    for (int i = 0; i < lenth; i++) {
-        arraySum += array[i];
-    }
-    return arraySum / (double)lenth;
-}
 
 const bool compareWithLib(int base, int exponent, double resultNeedToCheck, int orderOfAccuracy) {
     double libAnswer = pow((double)base, (double)exponent);
@@ -65,32 +58,33 @@ const bool compareWithLib(int base, int exponent, double resultNeedToCheck, int 
 }
 
 const bool globalTest(int maxExponent, int orderOfAccuracy, bool needToDisplayFails) {
-    int base[] = {-3, -2, -1, 0, 1, 2, 3, 4, 5};
-    int basesLenth = ARRAY_LENTH(base);
     bool isTestSuccesful = true;
     int countOfSuccesfulTests = 0;
     int countOfTests = 0;
+
+    clock_t start, end;
     double classicPowerRuntime = 0;
     double recursivePowerRuntime = 0;
     double libPowerRuntime = 0;
-    for (int basePeaker = 0; basePeaker < basesLenth; basePeaker++) {
-        for (int i = -3; i <= maxExponent; i++) {
-            clock_t start, end;
 
+    int base[] = {-3, -2, -1, 0, 1, 2, 3, 4, 5};
+    int basesLength = ARRAY_LENGTH(base);
+    for (int basePeaker = 0; basePeaker < basesLength; basePeaker++) {
+        for (int i = -3; i <= maxExponent; i++) {
             start = clock();
             double classicResult = classicPower(base[basePeaker], i);
             end = clock();
-            classicPowerRuntime += RUNTIME(start, end);
+            classicPowerRuntime += TIME_USED(start, end);
 
             start = clock();
             double recursiveResult = recursivePower(base[basePeaker], i);
             end = clock();
-            recursivePowerRuntime += RUNTIME(start, end);
+            recursivePowerRuntime += TIME_USED(start, end);
 
             start = clock();
             double libResult = pow((double) base[basePeaker], (double)i);
             end = clock();
-            libPowerRuntime += RUNTIME(start, end);
+            libPowerRuntime += TIME_USED(start, end);
 
             bool isResultsCorrect = compareWithLib(base[basePeaker], i, classicResult, orderOfAccuracy) * compareWithLib(base[basePeaker], i, recursiveResult, orderOfAccuracy);
             if (!isResultsCorrect) {
