@@ -7,10 +7,10 @@
 
 // Написать программу, которая заполняет массив случайными значениями (с использованием функции rand из stdlib.h), потом преобразует его без использования дополнительных массивов так, что в начале массива будут элементы, меньшие первого, а в конце — большие либо равные первому. Программа должна работать за линейное время.
 
-void swap(int *array, int i, int j) {
-    int temp = array[i];
-    array[i] = array[j];
-    array[j] = temp;
+void swap(int *array, int firstElementIndex, int secondElementIndex) {
+    int temp = array[firstElementIndex];
+    array[firstElementIndex] = array[secondElementIndex];
+    array[secondElementIndex] = temp;
 }
 
 void pushFirstElementToMid(int *randomArray, int arrayLength) {
